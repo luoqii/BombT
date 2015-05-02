@@ -3,6 +3,7 @@ package com.bombtime.bombtime;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,6 +44,9 @@ public class MainActivity extends Activity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_add){
+            Intent add = new Intent(this, AddTaskActivity.class);
+            startActivity(add);
         }
 
         return super.onOptionsItemSelected(item);
