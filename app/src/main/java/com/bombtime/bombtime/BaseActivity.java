@@ -3,6 +3,7 @@ package com.bombtime.bombtime;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
@@ -32,8 +33,20 @@ public class BaseActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        menu.
+        menu.add(0, R.id.android_comm_lib_menu_logcat, 0, "Logcat");
+//        getMenuInflater().inflate(R.menu.menu_base_activity, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.android_comm_lib_menu_logcat:
+                LogcatActivity.start(this);
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

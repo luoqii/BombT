@@ -45,7 +45,8 @@
 
         <activity
             android:name="org.bbs.android.commonlib.activity.LogcatActivity"
-            android:label="androidcommonlib/LogcatActivity" >
+            android:label="androidcommonlib/LogcatActivity"
+            android:process=":logcat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
