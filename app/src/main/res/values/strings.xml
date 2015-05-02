@@ -8,4 +8,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="start_now">start now</string>
     <string name="menu_done">Done</string>
+    <string name="title_activity_task_detail_activitya">TaskDetailActivity</string>
+    <string name="title_activity_task_detail">TaskDetailActivity</string>
 </resources>
