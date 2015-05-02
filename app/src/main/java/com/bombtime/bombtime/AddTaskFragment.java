@@ -1,9 +1,14 @@
 package com.bombtime.bombtime;
 
 
+import java.sql.SQLException;
+
+import com.j256.ormlite.dao.Dao;
+
 import android.os.Bundle;
 import android.app.Fragment;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,7 +21,7 @@ import android.widget.EditText;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddTaskFragment extends Fragment {
+public class AddTaskFragment extends BaseFragment {
 
 
     private EditText mNameV;
@@ -25,6 +30,12 @@ public class AddTaskFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,7 +69,29 @@ public class AddTaskFragment extends Fragment {
     }
 
     private void checkAndSave() {
-
+    	if (dataIsReady()) {
+    		TaskData task = new TaskData();
+    		task.name = mNameV.getText().toString();
+    		task.endTime = System.currentTimeMillis() + 2 * 10 * 1000;
+    		
+    		Dao<TaskData, Integer> dao;
+			try {
+				dao = getHelper().getTaskDataDao();
+	    		dao.create(task);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+			getActivity().finish();
+    	}
     }
+
+
+	private boolean dataIsReady() {
+		boolean ready = !TextUtils.isEmpty(mNameV.getText());
+		return ready;
+	}
+    
+    
 
 }
