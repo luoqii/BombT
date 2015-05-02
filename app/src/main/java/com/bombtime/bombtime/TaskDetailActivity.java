@@ -6,7 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class TaskDetailActivity extends Activity {
+public class TaskDetailActivity extends BaseActivity {
 
     /**
      * type {@link int}
