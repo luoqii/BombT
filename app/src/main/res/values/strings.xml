@@ -10,4 +10,5 @@
     <string name="menu_done">Done</string>
     <string name="title_activity_task_detail_activitya">TaskDetailActivity</string>
     <string name="title_activity_task_detail">TaskDetailActivity</string>
+    <string name="menu_edit">Edit</string>
 </resources>

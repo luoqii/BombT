@@ -11,7 +11,11 @@ public class AddTaskActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_add_task);
-        
+
+        getFragmentManager().beginTransaction()
+                .add(R.id.fragment_container,
+                        AddTaskFragment.newInstance(getIntent().getIntExtra(TaskDetailActivity.EXTRA_TASK_ID, -1)))
+                .commit();
     }
 
     @Override

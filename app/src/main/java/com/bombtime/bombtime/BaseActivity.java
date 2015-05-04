@@ -28,13 +28,17 @@ public class BaseActivity extends Activity {
     }
 
     public void onUserInteraction() {
-        mCrazyClicker.onClick();
+        if (BuildConfig.DEBUG) {
+            mCrazyClicker.onClick();
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, R.id.android_comm_lib_menu_logcat, 0, "Logcat");
+        if (BuildConfig.DEBUG) {
+            menu.add(0, R.id.android_comm_lib_menu_logcat, 0, "Logcat");
 //        getMenuInflater().inflate(R.menu.menu_base_activity, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -43,6 +47,9 @@ public class BaseActivity extends Activity {
         switch (item.getItemId()) {
             case R.id.android_comm_lib_menu_logcat:
                 LogcatActivity.start(this);
+                break;
+            case android.R.id.home:
+                finish();
                 break;
         }
 

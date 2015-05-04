@@ -13,7 +13,7 @@
         android:id="@+id/tob_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1">
+        >
 
         <TextView
             android:layout_width="0dp"
@@ -36,7 +36,23 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="1"></LinearLayout>
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/thumb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_launcher" />
+
+        <view class="com.bombtime.bombtime.TaskDetailFragment$ReminderTimeView"
+            android:id="@+id/reminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="ReminderTimeView" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/bottom_bar"
@@ -48,8 +64,8 @@
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:text="pause"
-            android:id="@+id/button_pause"
+            android:text="start"
+            android:id="@+id/button_start_or_pause"
             android:layout_weight="1" />
 
         <Button
