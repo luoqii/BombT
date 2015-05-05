@@ -1,17 +1,21 @@
 package com.bombtime.bombtime;
 
+import android.util.Log;
+
 import com.j256.ormlite.field.DatabaseField;
 
 public class TaskData {
+	private static final String TAG = TaskData.class.getSimpleName();
+
 	public static final String FIELD_NAME = "name";
 	public static final String FIELD_TYPE = "type";
 	public static final String FIELD_STATE = "state";
 	public static final String FIELD_START_TIME = "startTime";
-	public static final String FIELD_END_TIME = "endTime";
 
-    public static final int STATE_NEW_CREATE = 0;
-    public static final int STATE_START = 1;
-    public static final int STATE_PAUSE = 2;
+	public static final String FIELD_END_TIME = "endTime";
+	public static final int STATE_NEW_CREATE = 0;
+	public static final int STATE_START = 1;
+	public static final int STATE_PAUSE = 2;
 	public static final int STATE_DONE = 3;
 	public static final int STATE_FAIL = 4;
 
@@ -38,6 +42,7 @@ public class TaskData {
     private long endTime;
     @DatabaseField
     private long workTime;
+	private long currentTime;
 	@DatabaseField(columnName = FIELD_STATE)
 	private int state;
 	@DatabaseField(columnName = FIELD_TYPE)
@@ -89,7 +94,9 @@ public class TaskData {
 		this.type = type;
 	}
 	public String toDebugStr(){
-		return toTypeStr(type) + "|" + toStateStr(state);
+		return toTypeStr(type) + "|" + toStateStr(state)
+				+ (state == STATE_START ? "|" + ((float)(currentTime - startTime) / (endTime - startTime)) : "")
+				;
 	}
 
 	String toTypeStr(int type){
@@ -141,5 +148,17 @@ public class TaskData {
 
 	public void setCreatedTime(long createdTime) {
 		this.createdTime = createdTime;
+	}
+
+	public long getCurrentTime() {
+		return currentTime;
+	}
+
+	public void setCurrentTime(long currentTime) {
+		this.currentTime = currentTime;
+		if (currentTime < startTime) {
+			Log.w(TAG, "currentTime is before startTime");
+		}
+
 	}
 }

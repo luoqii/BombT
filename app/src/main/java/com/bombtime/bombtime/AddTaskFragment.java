@@ -181,8 +181,11 @@ public class AddTaskFragment extends BaseFragment implements View.OnClickListene
                 state = TaskData.STATE_START;
                 task.setStartTime(System.currentTimeMillis());
             }
+
             // start it now.
             state = TaskData.STATE_START;
+            task.setStartTime(System.currentTimeMillis());
+
             task.setState(state);
 
             Dao<TaskData, Integer> dao;
