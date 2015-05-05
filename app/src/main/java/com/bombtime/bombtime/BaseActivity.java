@@ -37,7 +37,6 @@ public class BaseActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         if (BuildConfig.DEBUG) {
             menu.add(0, R.id.android_comm_lib_menu_logcat, 0, "Logcat");
-//        getMenuInflater().inflate(R.menu.menu_base_activity, menu);
         }
         return super.onCreateOptionsMenu(menu);
     }

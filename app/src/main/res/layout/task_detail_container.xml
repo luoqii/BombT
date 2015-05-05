@@ -64,6 +64,7 @@
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:visibility="gone"
             android:text="start"
             android:id="@+id/button_start_or_pause"
             android:layout_weight="1" />

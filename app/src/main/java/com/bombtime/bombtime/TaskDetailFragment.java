@@ -23,11 +23,15 @@ import android.widget.TextView;
 
 import com.j256.ormlite.dao.Dao;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class TaskDetailFragment extends BaseFragment {
+public class TaskDetailFragment extends BaseFragment implements  View.OnClickListener {
 
     /**
      * type {@link int}
@@ -41,13 +45,16 @@ public class TaskDetailFragment extends BaseFragment {
     private  int mButtonAction = ACTION_START;
 
     private int mTaskId;
-    private View.OnClickListener mListerner;
 
-	private TextView mStartOrPauseV;
-	private View mDeleteV;
-	private View mDoneV;
+    @InjectView(R.id.button_start_or_pause)
+	/*private*/ TextView mStartOrPauseV;
+    @InjectView(R.id.button_delete)
+    /*private*/ View mDeleteV;
+    @InjectView(R.id.button_done)
+    /*private*/ View mDoneV;
+    @InjectView(R.id.reminder)
+	/*private*/ ReminderTimeView mReminderV;
 
-	private ReminderTimeView mReminderV;
     private TaskData mTask;
 
     public static TaskDetailFragment newInstance(int id) {
@@ -75,43 +82,43 @@ public class TaskDetailFragment extends BaseFragment {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        mListerner = new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                try {
-                    Dao<TaskData, Integer> dao = getHelper().getTaskDataDao();
-                    switch (view.getId()) {
-                        case R.id.button_delete:
-                            dao.deleteById(mTaskId);
-                            getActivity().finish();
-                            break;
-                        case R.id.button_done:
-                            mTask.setState(TaskData.STATE_DONE);
-                            dao.update(mTask);
-                            getActivity().finish();
-                            break;
-                        case R.id.button_start_or_pause:
-                            if (mButtonAction == ACTION_PAUSE) {
-                                mTask.setState(TaskData.STATE_PAUSE);
-                                mReminderV.stop();
-                            } else {
-                                mTask.setState(TaskData.STATE_START);
-                                mReminderV.start(mTask.getEndTime() - System.currentTimeMillis());
-                            }
-                            mButtonAction = mButtonAction == ACTION_PAUSE ? ACTION_START : ACTION_PAUSE;
-                            updateStartButtonText(mButtonAction);
-                            dao.update(mTask);
-                            updateUi();
-                            break;
-                        case R.id.tob_bar:
-                            doEdit();
-                            break;
+    }
+
+    @OnClick({R.id.button_delete, R.id.button_done, R.id.button_start_or_pause,R.id.tob_bar})
+    @Override
+    public void onClick(View view) {
+        try {
+            Dao<TaskData, Integer> dao = getHelper().getTaskDataDao();
+            switch (view.getId()) {
+                case R.id.button_delete:
+                    dao.deleteById(mTaskId);
+                    getActivity().finish();
+                    break;
+                case R.id.button_done:
+                    mTask.setState(TaskData.STATE_DONE);
+                    dao.update(mTask);
+                    getActivity().finish();
+                    break;
+                case R.id.button_start_or_pause:
+                    if (mButtonAction == ACTION_PAUSE) {
+                        mTask.setState(TaskData.STATE_PAUSE);
+                        mReminderV.stop();
+                    } else {
+                        mTask.setState(TaskData.STATE_START);
+                        mReminderV.start(mTask.getEndTime() - System.currentTimeMillis());
                     }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                    mButtonAction = mButtonAction == ACTION_PAUSE ? ACTION_START : ACTION_PAUSE;
+                    updateStartButtonText(mButtonAction);
+                    dao.update(mTask);
+                    updateUi();
+                    break;
+                case R.id.tob_bar:
+                    doEdit();
+                    break;
             }
-        };
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -154,10 +161,18 @@ public class TaskDetailFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mStartOrPauseV = (TextView) view.findViewById(R.id.button_start_or_pause);
-        mDeleteV = view.findViewById(R.id.button_delete);
-        mDoneV = view.findViewById(R.id.button_done);
-        mReminderV = (ReminderTimeView)view.findViewById(R.id.reminder);
+//        mStartOrPauseV = (TextView) view.findViewById(R.id.button_start_or_pause);
+//        mDeleteV = view.findViewById(R.id.button_delete);
+//        mDoneV = view.findViewById(R.id.button_done);
+//        mReminderV = (ReminderTimeView)view.findViewById(R.id.reminder);
+
+//        mStartOrPauseV.setOnClickListener(mListerner);
+//        mDeleteV.setOnClickListener(mListerner);
+//        mDoneV.setOnClickListener(mListerner);
+//        getView().findViewById(R.id.tob_bar).setOnClickListener(mListerner);
+
+        ButterKnife.inject(this,view);
+
         updateUi();
 
         if (DEBUG_UI){
@@ -166,6 +181,12 @@ public class TaskDetailFragment extends BaseFragment {
             String debugText = mTask.toDebugStr() + " startTime: " + getReminderTime(mTask.getStartTime());
             debugV.setText(debugText);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.reset(this);
     }
 
     private void doEdit() {
@@ -177,10 +198,6 @@ public class TaskDetailFragment extends BaseFragment {
     private void updateUi() {
 
         View contentV = getView();
-        mStartOrPauseV.setOnClickListener(mListerner);
-        mDeleteV.setOnClickListener(mListerner);
-        mDoneV.setOnClickListener(mListerner);
-        getView().findViewById(R.id.tob_bar).setOnClickListener(mListerner);
 
         int state = mTask.getState();
         if (mTask.getState() == TaskData.STATE_START) {

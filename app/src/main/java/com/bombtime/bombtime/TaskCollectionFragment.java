@@ -28,8 +28,8 @@ import com.j256.ormlite.stmt.QueryBuilder;
  * A simple {@link Fragment} subclass.
  */
 public class TaskCollectionFragment extends BaseFragment {
+    private static final boolean DEBUG_UI = BuildConfig.DEBUG && true;
 
-    private static final boolean DEBUG_UI = BuildConfig.DEBUG && false;
     private  RecyclerView mTaskV;
     private  RecyclerView.Adapter mAdapter;
 
@@ -88,6 +88,7 @@ public class TaskCollectionFragment extends BaseFragment {
         try {
             Dao<TaskData, Integer> dao = getHelper().getTaskDataDao();
             List<TaskData> tasks = dao.queryForAll();
+            tasks = getData();
 
             mAdapter = new TasksAdapter(tasks);
             mTaskV.setAdapter(mAdapter);
@@ -101,7 +102,13 @@ public class TaskCollectionFragment extends BaseFragment {
         try {
             Dao<TaskData, Integer> dao = getHelper().getTaskDataDao();
             QueryBuilder<TaskData, Integer> builder = dao.queryBuilder();
-            builder.
+            builder.where().lt(TaskData.FIELD_STATE, TaskData.STATE_DONE);
+            builder.orderBy(TaskData.FIELD_END_TIME, true);
+            tasks.addAll(dao.query(builder.prepare()));
+            builder = dao.queryBuilder();
+            builder.where().ge(TaskData.FIELD_STATE, TaskData.STATE_DONE);
+            builder.orderBy(TaskData.FIELD_END_TIME, true);
+            tasks.addAll(dao.query(builder.prepare()));
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -23,24 +23,39 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ToggleButton;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class AddTaskFragment extends BaseFragment implements View.OnClickListener {
-
-
     private static final java.lang.String TAG = AddTaskFragment.class.getSimpleName();
-    private EditText mNameV;
-    private TextView mDateV;
-    private TextView mTimeV;
-    private ToggleButton mToggleV;
+    private static final boolean DEBUG_UI = BuildConfig.DEBUG && true;
+
+    @InjectView(R.id.name)
+    /*private*/ EditText mNameV;
+    @InjectView(R.id.date)
+    /*private*/ TextView mDateV;
+    @InjectView(R.id.time)
+    /*private*/ TextView mTimeV;
+    @InjectView(R.id.start_now)
+    /*private*/ ToggleButton mToggleV;
+//    @InjectView(R.id.button_ok)
+//    Button mOkV;
+//    @InjectView(R.id.button_cance)
+//    Button mCancleV;
+
     private Calendar mTaskC;
     private int mTaskId;
     private TaskData mTask;
@@ -87,21 +102,24 @@ public class AddTaskFragment extends BaseFragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_add_task, container, false);
+        View view = inflater.inflate(R.layout.fragment_add_task, container, false);
+        return view;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+//        mNameV = ((EditText) view.findViewById(R.id.name));
+//        mDateV = (TextView) view.findViewById(R.id.date);
+//        mTimeV = (TextView) view.findViewById(R.id.time);
+//        mToggleV = (ToggleButton) view.findViewById(R.id.start_now);
 
-        mNameV = ((EditText) view.findViewById(R.id.name));
-        mDateV = (TextView) view.findViewById(R.id.date);
-        mTimeV = (TextView) view.findViewById(R.id.time);
-        mToggleV = (ToggleButton) view.findViewById(R.id.start_now);
+//        mDateV.setOnClickListener(this);
+//        mTimeV.setOnClickListener(this);
 
-        mDateV.setOnClickListener(this);
-        mTimeV.setOnClickListener(this);
+        ButterKnife.inject(this, view);
+
         mTaskC = Calendar.getInstance();
 
         Calendar rightNow = Calendar.getInstance();
@@ -111,6 +129,12 @@ public class AddTaskFragment extends BaseFragment implements View.OnClickListene
         mTaskC = rightNow;
 
         updateWith(mTask);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.reset(this);
     }
 
     @Override
@@ -157,6 +181,8 @@ public class AddTaskFragment extends BaseFragment implements View.OnClickListene
                 state = TaskData.STATE_START;
                 task.setStartTime(System.currentTimeMillis());
             }
+            // start it now.
+            state = TaskData.STATE_START;
             task.setState(state);
 
             Dao<TaskData, Integer> dao;
@@ -183,6 +209,7 @@ public class AddTaskFragment extends BaseFragment implements View.OnClickListene
     }
 
 
+    @OnClick({R.id.time, R.id.date, R.id.button_ok, R.id.button_cance})
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -191,6 +218,12 @@ public class AddTaskFragment extends BaseFragment implements View.OnClickListene
                 break;
             case R.id.date:
                 new DatePickerFragment().show(getFragmentManager(), "datepicker");
+                break;
+            case R.id.button_ok:
+                checkAndSave();
+                break;
+            case R.id.button_cance:
+                getActivity().finish();
                 break;
         }
     }
@@ -203,6 +236,13 @@ public class AddTaskFragment extends BaseFragment implements View.OnClickListene
     private void updateTime(int hourOfDay, int minute, boolean is2fHour) {
         String time = getTimeStr(hourOfDay, minute);
         mTimeV.setText(time);
+        if (DEBUG_UI){
+            String text = mNameV.getText().toString();
+            final char C = 'T';
+            text = text.replaceAll(C + "[0-9:/]*" + C, "");
+            text += " " + C + time + C;
+            mNameV.setText(text);
+        }
 
         mTaskC.set(Calendar.HOUR_OF_DAY, hourOfDay);
         mTaskC.set(Calendar.MINUTE, minute);
@@ -215,7 +255,7 @@ public class AddTaskFragment extends BaseFragment implements View.OnClickListene
 
     public static String getTimeStr(int hourOfDay, int minute) {
         String time = "new time";
-        time = hourOfDay + ":" + minute;
+        time = ((hourOfDay <= 9 ? "0" : "") + hourOfDay) +  ":" + ((minute <= 9 ? "0" : "") + minute);
         return time;
     }
 
@@ -226,6 +266,14 @@ public class AddTaskFragment extends BaseFragment implements View.OnClickListene
     private void updateDate(int year, int month, int day) {
         String date = getDateStr(year, month, day);
         mDateV.setText(date);
+
+        if (DEBUG_UI){
+            String text = mNameV.getText().toString();
+            final char C = 'D';
+            text = text.replaceAll(C + "[0-9:/]*" + C, "");
+            text += " " + C + date + C;
+            mNameV.setText(text);
+        }
 
         mTaskC.set(Calendar.YEAR, year);
         mTaskC.set(Calendar.MONTH, month);

@@ -6,12 +6,14 @@ public class TaskData {
 	public static final String FIELD_NAME = "name";
 	public static final String FIELD_TYPE = "type";
 	public static final String FIELD_STATE = "state";
-	public static final String FIELD_NAME = "name";
-	public static final String FIELD_NAME = "name";
+	public static final String FIELD_START_TIME = "startTime";
+	public static final String FIELD_END_TIME = "endTime";
+
     public static final int STATE_NEW_CREATE = 0;
     public static final int STATE_START = 1;
     public static final int STATE_PAUSE = 2;
 	public static final int STATE_DONE = 3;
+	public static final int STATE_FAIL = 4;
 
 	public static final int TYPE_BOMB = 0;
 	public static final int TYPE_TIMED_BOMB = 1;
@@ -20,7 +22,7 @@ public class TaskData {
 	@DatabaseField(generatedId = true)
     private int id;
 
-    @DatabaseField(foreignColumnName = FIELD_NAME)
+    @DatabaseField(columnName = FIELD_NAME)
     private String name;
 	@DatabaseField
 	private long createdTime;
@@ -36,9 +38,9 @@ public class TaskData {
     private long endTime;
     @DatabaseField
     private long workTime;
-	@DatabaseField(foreignColumnName = FIELD_STATE)
+	@DatabaseField(columnName = FIELD_STATE)
 	private int state;
-	@DatabaseField(foreignColumnName = FIELD_TYPE)
+	@DatabaseField(columnName = FIELD_TYPE)
 	private int type;
     
 	public int getId() {
@@ -80,15 +82,12 @@ public class TaskData {
 			startTime = System.currentTimeMillis();
 		}
 	}
-
 	public int getType() {
 		return type;
 	}
-
 	public void setType(int type) {
 		this.type = type;
 	}
-
 	public String toDebugStr(){
 		return toTypeStr(type) + "|" + toStateStr(state);
 	}
@@ -124,6 +123,9 @@ public class TaskData {
 				break;
 			case STATE_START:
 				str = "STATE_START";
+				break;
+			case STATE_FAIL:
+				str = "STATE_FAIL";
 				break;
 		}
 
