@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
@@ -11,5 +9,5 @@
     android:text="debug info"
     android:id="@+id/debug_info"
     android:visibility="gone"
-    android:textColor="#ff0000"
-    tools:showIn="@layout/fragment_task_detail" />
+    tools:visibility="visible"
+    android:textColor="#ff0000" />

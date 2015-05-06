@@ -11,8 +11,10 @@ public class TaskData {
 	public static final String FIELD_TYPE = "type";
 	public static final String FIELD_STATE = "state";
 	public static final String FIELD_START_TIME = "startTime";
-
 	public static final String FIELD_END_TIME = "endTime";
+	public static final String FIELD_MARK_AS_DELETE = "markAsDelete";
+	public static final String FIELD_PENDING_STATE = "pendingState";
+
 	public static final int STATE_NEW_CREATE = 0;
 	public static final int STATE_START = 1;
 	public static final int STATE_PAUSE = 2;
@@ -45,8 +47,16 @@ public class TaskData {
 	private long currentTime;
 	@DatabaseField(columnName = FIELD_STATE)
 	private int state;
+	/**
+	 * for do-redo.
+	 */
+	@DatabaseField(columnName = FIELD_PENDING_STATE)
+	private int pendingState;
 	@DatabaseField(columnName = FIELD_TYPE)
 	private int type;
+	@DatabaseField(columnName = FIELD_MARK_AS_DELETE)
+	private boolean markAsDelete;
+
     
 	public int getId() {
 		return id;
@@ -95,6 +105,7 @@ public class TaskData {
 	}
 	public String toDebugStr(){
 		return toTypeStr(type) + "|" + toStateStr(state)
+				+ (markAsDelete == true ? "|D" : "" )
 				+ (state == STATE_START ? "|" + ((float)(currentTime - startTime) / (endTime - startTime)) : "")
 				;
 	}
@@ -160,5 +171,21 @@ public class TaskData {
 			Log.w(TAG, "currentTime is before startTime");
 		}
 
+	}
+
+	public boolean isMarkAsDelete() {
+		return markAsDelete;
+	}
+
+	public void setMarkAsDelete(boolean markAsDelete) {
+		this.markAsDelete = markAsDelete;
+	}
+
+	public int getPendingState() {
+		return pendingState;
+	}
+
+	public void setPendingState(int pendingState) {
+		this.pendingState = pendingState;
 	}
 }

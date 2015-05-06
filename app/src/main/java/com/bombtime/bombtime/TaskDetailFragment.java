@@ -91,7 +91,13 @@ public class TaskDetailFragment extends BaseFragment implements  View.OnClickLis
             Dao<TaskData, Integer> dao = getHelper().getTaskDataDao();
             switch (view.getId()) {
                 case R.id.button_delete:
-                    dao.deleteById(mTaskId);
+//                    dao.deleteById(mTaskId);
+
+//                    DoUndoWindow undo = new DoUndoWindow(getActivity(), new TaskCollectionFragment.DeleteTasksAction(mTask));
+//
+//                    undo.setWidth(300);
+//                    undo.setHeight(80);
+//                    undo.showAsDropDown((View) view.getParent());
                     getActivity().finish();
                     break;
                 case R.id.button_done:
