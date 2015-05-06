@@ -20,6 +20,10 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        TaskCollectionFragment.DoUndoWindow w = new TaskCollectionFragment.DoUndoWindow(this);
+//        w.setContentView(R.layout.window_doundo);
+//        w.show();
     }
 
     @Override

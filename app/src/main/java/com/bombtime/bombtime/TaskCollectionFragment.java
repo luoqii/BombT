@@ -1,11 +1,6 @@
 package com.bombtime.bombtime;
 
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
@@ -17,12 +12,14 @@ import android.os.Message;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -31,6 +28,10 @@ import android.widget.TextView;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -41,14 +42,13 @@ import butterknife.OnItemClick;
  * A simple {@link Fragment} subclass.
  */
 public class TaskCollectionFragment extends BaseFragment {
-    private static final String TAG = TaskCollectionFragment.class.getSimpleName()
-            ;
+    private static final String TAG = TaskCollectionFragment.class.getSimpleName();
     private static final boolean DEBUG_UI = BuildConfig.DEBUG && true;
     public static final int DELAY_MILLIS = 1000;
     private final Handler mHandler;
     private List<Integer> mSelectItems;
 
-    private  RecyclerView mTaskV;
+    private RecyclerView mTaskV;
     private RecyclerTasksAdapter mRecyclerAdapter;
 
     static private int[] sColors = null;
@@ -64,14 +64,14 @@ public class TaskCollectionFragment extends BaseFragment {
         // Required empty public constructor
         mDataMode = new DataModel();
 
-        mHandler = new Handler(){
+        mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 updateData();
 
             }
         };
-        mActionModeListener = new AbsListView.MultiChoiceModeListener(){
+        mActionModeListener = new AbsListView.MultiChoiceModeListener() {
 
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -115,7 +115,7 @@ public class TaskCollectionFragment extends BaseFragment {
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
                 TaskData t = mListAdapter.getItem(position);
-                if (checked){
+                if (checked) {
 
                     if (!mSelectItems.contains(position)) {
                         mSelectItems.add(position);
@@ -128,8 +128,8 @@ public class TaskCollectionFragment extends BaseFragment {
                 }
 
                 boolean hasFail = false;
-                for (Integer i : mSelectItems){
-                    if (mListAdapter.getItem(i).getState() == TaskData.STATE_FAIL){
+                for (Integer i : mSelectItems) {
+                    if (mListAdapter.getItem(i).getState() == TaskData.STATE_FAIL) {
                         hasFail = true;
                         break;
                     }
@@ -143,25 +143,23 @@ public class TaskCollectionFragment extends BaseFragment {
         };
     }
 
-    List<TaskData> getTask(List<Integer> ids){
-        List<TaskData> tasks = new ArrayList<>();
+    List<TaskData> getTask(List<Integer> ids) {
+        List<TaskData> tasks = new ArrayList<TaskData>();
 
-        for (Integer i : ids){
+        for (Integer i : ids) {
             tasks.add(mListAdapter.getItem(i));
         }
         return tasks;
     }
 
     private void prepareMarkAsDone(List<TaskData> tasks) {
-        DoUndoWindow undo = new DoUndoWindow(getActivity(), new DoneTasksAction(tasks));
-
-        undo.showAsDropDown(mListV);
+        DoUndoWindow undo = new DoUndoWindow(Application.getInstance(), new DoUndoWindow.DoneTasksAction(tasks));
+        undo.show();
     }
 
     private void prepareMaskAdDelete(List<TaskData> tasks) {
-        DoUndoWindow undo = new DoUndoWindow(getActivity(), new DeleteTasksAction(tasks));
-
-        undo.showAsDropDown(mListV);
+        DoUndoWindow undo = new DoUndoWindow(Application.getInstance(), new DoUndoWindow.DeleteTasksAction(tasks));
+        undo.show();
     }
 
     private void unScheduleUpdate() {
@@ -193,6 +191,7 @@ public class TaskCollectionFragment extends BaseFragment {
         super.onAttach(activity);
         sColors = new int[]{
                 getResources().getColor(R.color.android_comm_lib_silver),
+                getResources().getColor(R.color.android_comm_lib_lime),
                 getResources().getColor(R.color.android_comm_lib_gray)
         };
     }
@@ -205,7 +204,7 @@ public class TaskCollectionFragment extends BaseFragment {
 
         View contentV = initContentView();
 
-        ((ViewGroup)view).addView(contentV, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        ((ViewGroup) view).addView(contentV, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         return view;
     }
@@ -226,7 +225,7 @@ public class TaskCollectionFragment extends BaseFragment {
     }
 
     @OnItemClick(R.id.task_list)
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         TaskData t = (TaskData) view.getTag(R.id.TAG_DATA);
 
         viewDetail(view.getContext(), t);
@@ -270,7 +269,7 @@ public class TaskCollectionFragment extends BaseFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_done:
                 break;
         }
@@ -279,7 +278,7 @@ public class TaskCollectionFragment extends BaseFragment {
 
 
     void updateData() {
-        Log.d(TAG, "updateData");
+//        Log.d(TAG, "updateData");
 
 //        mRecyclerAdapter.updateData(mDataMode.getData());
 
@@ -298,12 +297,12 @@ public class TaskCollectionFragment extends BaseFragment {
 
         ArrayList<TaskData> mData;
 
-        DataModel(){
+        DataModel() {
             mData = new ArrayList<TaskData>();
         }
 
-        public ArrayList<TaskData> getData(){
-           ArrayList<TaskData> tasks = new ArrayList<>();
+        public ArrayList<TaskData> getData() {
+            ArrayList<TaskData> tasks = new ArrayList<TaskData>();
             try {
                 Dao<TaskData, Integer> dao = Application.getInstance().getHelper().getTaskDataDao();
                 QueryBuilder<TaskData, Integer> builder = dao.queryBuilder();
@@ -313,7 +312,7 @@ public class TaskCollectionFragment extends BaseFragment {
                         .ne(TaskData.FIELD_MARK_AS_DELETE, true);
                 builder.orderBy(TaskData.FIELD_END_TIME, true);
                 List<TaskData> tmp = dao.query(builder.prepare());
-                for (TaskData t : tmp){
+                for (TaskData t : tmp) {
                     tasks.add(t);
                 }
 
@@ -325,7 +324,7 @@ public class TaskCollectionFragment extends BaseFragment {
                         .ne(TaskData.FIELD_MARK_AS_DELETE, true);
                 builder.orderBy(TaskData.FIELD_END_TIME, true);
                 tmp = dao.query(builder.prepare());
-                for (TaskData t : tmp){
+                for (TaskData t : tmp) {
                     tasks.add(t);
                 }
 
@@ -334,15 +333,15 @@ public class TaskCollectionFragment extends BaseFragment {
                 e.printStackTrace();
             }
 
-           return tasks;
+            return tasks;
         }
 
         private void updateData(ArrayList<TaskData> tasks) {
             long time = System.currentTimeMillis();
-            for (TaskData t: tasks){
+            for (TaskData t : tasks) {
                 t.setCurrentTime(time);
 
-                if (t.getState() == TaskData.STATE_START && time > t.getEndTime()){
+                if (t.getState() == TaskData.STATE_START && time > t.getEndTime()) {
                     t.setState(TaskData.STATE_FAIL);
                     try {
                         Application.getInstance().getHelper().getTaskDataDao().update(t);
@@ -361,7 +360,7 @@ public class TaskCollectionFragment extends BaseFragment {
             super(context, 0);
         }
 
-        public void updateData(ArrayList<TaskData> tasks){
+        public void updateData(ArrayList<TaskData> tasks) {
             clear();
             addAll(tasks);
             notifyDataSetChanged();
@@ -370,7 +369,7 @@ public class TaskCollectionFragment extends BaseFragment {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             VH viewHolder = null;
-            if (convertView != null){
+            if (convertView != null) {
                 viewHolder = (VH) convertView.getTag();
             } else {
                 convertView = View.inflate(getContext(), R.layout.task_item_container, null);
@@ -386,12 +385,12 @@ public class TaskCollectionFragment extends BaseFragment {
 
     class RecyclerTasksAdapter extends RecyclerView.Adapter {
 
-        private ArrayList<TaskData> mTasks = new ArrayList<>();
+        private ArrayList<TaskData> mTasks = new ArrayList<TaskData>();
 
-        public RecyclerTasksAdapter(){
+        public RecyclerTasksAdapter() {
         }
 
-        public void updateData(ArrayList<TaskData> tasks){
+        public void updateData(ArrayList<TaskData> tasks) {
             mTasks = tasks;
             notifyDataSetChanged();
         }
@@ -455,7 +454,7 @@ public class TaskCollectionFragment extends BaseFragment {
 //                }
 //            });
 
-            if (DEBUG_UI){
+            if (DEBUG_UI) {
                 debugV.setVisibility(View.VISIBLE);
                 debugV.setText(t.toDebugStr());
             }
@@ -467,87 +466,5 @@ public class TaskCollectionFragment extends BaseFragment {
         Intent detail = new Intent(context, TaskDetailActivity.class);
         detail.putExtra(TaskDetailActivity.EXTRA_TASK_ID, t.getId());
         context.startActivity(detail);
-    }
-
-    public static class DeleteTasksAction implements  DoUndoWindow.IDoUnDo {
-
-        private final List<TaskData> mTask;
-
-        DeleteTasksAction(List<TaskData> task){
-            mTask = task;
-        }
-        DeleteTasksAction(TaskData task){
-            mTask = new ArrayList<>();
-            mTask.add(task);
-        }
-
-        @Override
-        public void doIt() {
-            try {
-                Dao<TaskData, Integer> dao = Application.getInstance().getHelper().getTaskDataDao();
-
-                for (TaskData t: mTask) {
-                    t.setMarkAsDelete(true);
-                    dao.update(t);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void undoIt() {
-            try {
-                Dao<TaskData, Integer> dao = Application.getInstance().getHelper().getTaskDataDao();
-
-                for (TaskData t: mTask) {
-                    t.setMarkAsDelete(false);
-                    dao.update(t);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    public static class DoneTasksAction implements  DoUndoWindow.IDoUnDo {
-
-        private final List<TaskData> mTask;
-
-        DoneTasksAction(List<TaskData> task){
-            mTask = task;
-        }
-        DoneTasksAction(TaskData task){
-            mTask = new ArrayList<>();
-            mTask.add(task);
-        }
-
-        @Override
-        public void doIt() {
-            try {
-                Dao<TaskData, Integer> dao = Application.getInstance().getHelper().getTaskDataDao();
-
-                for (TaskData t: mTask) {
-                    t.setPendingState(t.getState());
-                    t.setState(TaskData.STATE_DONE);
-                    dao.update(t);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void undoIt() {
-            try {
-                Dao<TaskData, Integer> dao = Application.getInstance().getHelper().getTaskDataDao();
-
-                for (TaskData t: mTask) {
-                    t.setState(t.getPendingState());
-                    dao.update(t);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

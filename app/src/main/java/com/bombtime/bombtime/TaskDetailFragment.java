@@ -1,11 +1,5 @@
 package com.bombtime.bombtime;
 
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.SimpleTimeZone;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,6 +16,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.j256.ormlite.dao.Dao;
+
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.SimpleTimeZone;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -93,11 +93,9 @@ public class TaskDetailFragment extends BaseFragment implements  View.OnClickLis
                 case R.id.button_delete:
 //                    dao.deleteById(mTaskId);
 
-//                    DoUndoWindow undo = new DoUndoWindow(getActivity(), new TaskCollectionFragment.DeleteTasksAction(mTask));
-//
-//                    undo.setWidth(300);
-//                    undo.setHeight(80);
-//                    undo.showAsDropDown((View) view.getParent());
+                    DoUndoWindow undo = new DoUndoWindow(Application.getInstance(), new DoUndoWindow.DeleteTasksAction(mTask));
+                    undo.show();
+
                     getActivity().finish();
                     break;
                 case R.id.button_done:
