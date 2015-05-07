@@ -128,10 +128,13 @@ public class TaskCollectionFragment extends BaseFragment {
                 }
 
                 boolean hasFail = false;
+                boolean hasDone = false;
                 for (Integer i : mSelectItems) {
                     if (mListAdapter.getItem(i).getState() == TaskData.STATE_FAIL) {
                         hasFail = true;
-                        break;
+                    }
+                    if (mListAdapter.getItem(i).getState() == TaskData.STATE_DONE) {
+                        hasDone = true;
                     }
                 }
                 mode.getMenu().findItem(R.id.action_done).setVisible(!hasFail);

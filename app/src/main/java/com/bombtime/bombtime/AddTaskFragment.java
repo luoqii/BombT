@@ -3,6 +3,7 @@ package com.bombtime.bombtime;
 
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.CancellationException;
 
 import com.j256.ormlite.dao.Dao;
@@ -14,6 +15,7 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -119,6 +121,9 @@ public class AddTaskFragment extends BaseFragment implements View.OnClickListene
 //        mTimeV.setOnClickListener(this);
 
         ButterKnife.inject(this, view);
+        if (DEBUG_UI){
+            mNameV.setFilters(new InputFilter[]{new InputFilter.LengthFilter(40)});
+        }
 
         mTaskC = Calendar.getInstance();
 
@@ -240,10 +245,13 @@ public class AddTaskFragment extends BaseFragment implements View.OnClickListene
         String time = getTimeStr(hourOfDay, minute);
         mTimeV.setText(time);
         if (DEBUG_UI){
+            String secStr = String.format("%tS", new Date());
             String text = mNameV.getText().toString();
             final char C = 'T';
             text = text.replaceAll(C + "[0-9:/]*" + C, "");
-            text += " " + C + time + C;
+            text += " " + C + time +
+                    ":" + secStr +
+                    C;
             mNameV.setText(text);
         }
 

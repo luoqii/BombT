@@ -104,9 +104,10 @@ public class TaskData {
 		this.type = type;
 	}
 	public String toDebugStr(){
+		String pStr = String.format("% 2.5f", ((float)(currentTime - startTime) / (endTime - startTime)));
 		return toTypeStr(type) + "|" + toStateStr(state)
 				+ (markAsDelete == true ? "|D" : "" )
-				+ (state == STATE_START ? "|" + ((float)(currentTime - startTime) / (endTime - startTime)) : "")
+				+ (state == STATE_START ? "|" + pStr : "")
 				;
 	}
 

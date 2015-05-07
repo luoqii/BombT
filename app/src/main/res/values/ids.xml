@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="TAG_DATA" type="id">view_tag_data</item>
+    <item name="task_list" type="id">task_list</item>
+</resources>

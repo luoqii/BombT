@@ -13,6 +13,8 @@
 
         <EditText
             android:id="@+id/name"
+            android:maxEms="10"
+            android:maxLength="10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
