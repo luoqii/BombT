@@ -205,7 +205,6 @@ public class AddTaskFragment extends BaseFragment implements View.OnClickListene
         }
     }
 
-
     private boolean dataIsReady() {
         boolean ready = !TextUtils.isEmpty(mNameV.getText())
                 && !TextUtils.isEmpty(mTimeV.getText())

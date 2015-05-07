@@ -6,26 +6,30 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.ActionMode;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
 
@@ -43,8 +47,11 @@ import butterknife.OnItemClick;
  */
 public class TaskCollectionFragment extends BaseFragment {
     private static final String TAG = TaskCollectionFragment.class.getSimpleName();
+    private static final boolean DEBUG = BuildConfig.DEBUG && true;
     private static final boolean DEBUG_UI = BuildConfig.DEBUG && true;
+
     public static final int DELAY_MILLIS = 1000;
+
     private final Handler mHandler;
     private List<Integer> mSelectItems;
 
@@ -98,7 +105,7 @@ public class TaskCollectionFragment extends BaseFragment {
                         prepareMarkAsDone(getTask(mSelectItems));
                         break;
                     case R.id.action_delete:
-                        prepareMaskAdDelete(getTask(mSelectItems));
+                        prepareMaskAsDelete(getTask(mSelectItems));
                         break;
                 }
 
@@ -155,12 +162,25 @@ public class TaskCollectionFragment extends BaseFragment {
         return tasks;
     }
 
+
+    private void prepareMarkAsDone(TaskData task) {
+        List<TaskData> tasks = new ArrayList<>();
+        tasks.add(task);
+        prepareMarkAsDone(tasks);
+    }
+
     private void prepareMarkAsDone(List<TaskData> tasks) {
         DoUndoWindow undo = new DoUndoWindow(Application.getInstance(), new DoUndoWindow.DoneTasksAction(tasks));
         undo.show();
     }
 
-    private void prepareMaskAdDelete(List<TaskData> tasks) {
+    private void prepareMaskAsDelete(TaskData task) {
+        List<TaskData> tasks = new ArrayList<>();
+        tasks.add(task);
+        prepareMaskAsDelete(tasks);
+    }
+
+    private void prepareMaskAsDelete(List<TaskData> tasks) {
         DoUndoWindow undo = new DoUndoWindow(Application.getInstance(), new DoUndoWindow.DeleteTasksAction(tasks));
         undo.show();
     }
@@ -212,8 +232,16 @@ public class TaskCollectionFragment extends BaseFragment {
         return view;
     }
 
+    private int dp2px(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+                getResources().getDisplayMetrics());
+    }
+
     private View initContentView() {
         mListV = new ListView(getActivity());
+
+        mListV = createSwipeMenuListView();
+
         mListV.setId(R.id.task_list);
         mListV.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         mListV.setMultiChoiceModeListener(mActionModeListener);
@@ -227,9 +255,85 @@ public class TaskCollectionFragment extends BaseFragment {
         return mListV;
     }
 
+    private SwipeMenuListView createSwipeMenuListView() {
+        SwipeMenuListView v = new SwipeMenuListView(getActivity());
+        v.setMenuCreator(new SwipeMenuCreator() {
+            @Override
+            public void create(SwipeMenu swipeMenu) {
+                switch (swipeMenu.getViewType()) {
+                    case ListTasksAdapter.TYPE_NON_FAIL:
+                        SwipeMenuItem done = new SwipeMenuItem(getActivity());
+                        done.setTitle("Done");
+                        done.setTitleColor(Color.WHITE);
+                        done.setTitleSize((20));
+                        done.setId(R.id.action_done);
+                        done.setBackground(new ColorDrawable(Color.rgb(0xE5, 0x18,
+                                0x5E)));
+                        done.setWidth(dp2px(90));
+                        swipeMenu.addMenuItem(done);
+//                        break;// fall-through
+                    case ListTasksAdapter.TYPE_FAIL:
+                        SwipeMenuItem delete = new SwipeMenuItem(getActivity());
+                        delete.setTitle("delete");
+                        delete.setTitleColor(Color.WHITE);
+                        delete.setTitleSize((20));
+                        delete.setId(R.id.action_delete);
+                        delete.setBackground(new ColorDrawable(Color.rgb(0xC9, 0xC9,
+                                0xCE)));
+                        delete.setWidth(dp2px(90));
+                        delete.setIcon(R.drawable.ic_launcher);
+                        swipeMenu.addMenuItem(delete);
+                        break;
+                }
+            }
+        });
+        v.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu swipeMenu, int index) {
+                Log.d(TAG, "onMenuItemClick. position: " + position + " index: " + index + " menu: " + swipeMenu);
+                int type = mListAdapter.getItemViewType(position);
+                switch (type) {
+                    case ListTasksAdapter.TYPE_FAIL:
+                        prepareMaskAsDelete(mListAdapter.getItem(position));
+                        break;
+                    case ListTasksAdapter.TYPE_NON_FAIL:
+                        if (index == 0){
+                            prepareMarkAsDone(mListAdapter.getItem(position));
+                        } else {
+                            prepareMaskAsDelete(mListAdapter.getItem(position));
+                        }
+
+                        break;
+                }
+                return false;
+            }
+        });
+        v.setOnSwipeListener(new SwipeMenuListView.OnSwipeListener() {
+            @Override
+            public void onSwipeStart(int i) {
+                Log.d(TAG, "onSwipeStart");
+                unScheduleUpdate();
+            }
+
+            @Override
+            public void onSwipeEnd(int i) {
+                Log.d(TAG, "onSwipeEndS");
+
+            }
+        });
+        v.setOnMenuCloseListener(new SwipeMenuListView.OnMenuCloseListener() {
+            @Override
+            public boolean onMenuClose() {
+                scheduleUpdate();
+                return false;
+            }
+        });
+        return v;
+    }
+
     @OnItemClick(R.id.task_list)
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        TaskData t = (TaskData) view.getTag(R.id.TAG_DATA);
+        TaskData t = mListAdapter.getItem(position);
 
         viewDetail(view.getContext(), t);
     }
@@ -281,7 +385,9 @@ public class TaskCollectionFragment extends BaseFragment {
 
 
     void updateData() {
-//        Log.d(TAG, "updateData");
+        if (DEBUG) {
+            Log.d(TAG, "updateData");
+        }
 
 //        mRecyclerAdapter.updateData(mDataMode.getData());
 
@@ -359,6 +465,9 @@ public class TaskCollectionFragment extends BaseFragment {
 
     class ListTasksAdapter extends ArrayAdapter<TaskData> {
 
+        private static final int TYPE_FAIL = 1;
+        private static final int TYPE_NON_FAIL = 2;
+
         public ListTasksAdapter(Context context) {
             super(context, 0);
         }
@@ -367,6 +476,22 @@ public class TaskCollectionFragment extends BaseFragment {
             clear();
             addAll(tasks);
             notifyDataSetChanged();
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 3;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            TaskData t = getItem(position);
+            if (t.getState() == TaskData.STATE_FAIL){
+                return TYPE_FAIL;
+            } else {
+                return TYPE_NON_FAIL;
+            }
+//            return super.getItemViewType(position);
         }
 
         @Override

@@ -46,8 +46,8 @@ public class DoUndoWindow extends AlwaysOnTopWindow implements View.OnClickListe
 
         p.x = 10;
         p.y = 10;
-        p.width = 300;
-        p.height = 100;
+        p.width = mContext.getResources().getDimensionPixelSize(R.dimen.undo_widow_width);
+        p.height = mContext.getResources().getDimensionPixelSize(R.dimen.undo_widow_height);;
         p.gravity = Gravity.BOTTOM | Gravity.RIGHT;
 
         return p;
